@@ -33,6 +33,15 @@ void printArray(int* arr, int size){
     printf("]\n");
 }
 
+int checkArray(int* arr, int size){
+    for(int i=0; i<size; i++){
+        if (arr[i] != 101){
+            return 1;
+        }
+    }
+    return 0;
+}
+
 int main(int argc, char* argv[]){
     if(argc<3){
         printf("--ERRO: informe a qtde de threads e o tamanho do array como argumentos\n");
@@ -72,8 +81,8 @@ int main(int argc, char* argv[]){
         }
         start = args->start;
         end = args->end;
-        printf("args->start: %d\n", args->start);
-        printf("args->end: %d\n", args->end);
+        //printf("args->start: %d\n", args->start);
+        //printf("args->end: %d\n", args->end);
         if (pthread_create(&tid_sistema[i], NULL, thread_sum, args)){ 
             printf("--ERRO: pthread_create() falhou\n");
             return 2;
@@ -85,6 +94,11 @@ int main(int argc, char* argv[]){
     }
 
     //printArray(array, arraysize);
+    if(checkArray(array, arraysize)){
+        printf("--ERRO: Vetor com elemento sem incremento\n");
+    } else {
+        printf("Vetor correto!\n");
+    }
     pthread_exit(NULL);
     return 0;
 }
