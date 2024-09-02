@@ -5,7 +5,7 @@ file=tests.csv
 echo nthreads, size, time > $file
 
 trials=100
-size=(500 1000 2000 4000)
+size=(500 1000 2000)
 nthread=(1 2 4 8 12)
 
 for dim in ${size[@]}; do
