@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <pthread.h>
-#include <time.h>
+#include "timer.h"
 
-#define DEBUG
+//#define DEBUG
 
 typedef struct {
 	float* v;
@@ -99,10 +99,10 @@ void freeMatrix(mat* m){
 }
 
 void* thread_mult(void* args){
+    // obs: cache miss pode ser reduzido se utilizarmos
+    // uma versão transposta da matriz2 para que os elementos
+    // da coluna sejam sequenciais na memória.
     bound* limit = (bound*)args;
-    #ifdef DEBUG
-    printf("multiplique de %d a %d\n", limit->start, limit->end);
-    #endif
 	for(int col2 = limit->start; col2 < limit->end; col2++){
 		for(int row1 = 0; row1 < matrix1->rows; row1++){
 			int m1_row_start = row1*matrix1->cols;
@@ -153,6 +153,10 @@ int main(int argc, char* argv[]){
     int end = 0;
     int remainder = matrix2->cols%nthreads;
     int partition_size = matrix2->cols/nthreads;
+
+    // cronometrar
+    double begin, finish, elapsed;
+    GET_TIME(begin);
     for (int i = 0; i < nthreads; i++){
         bound* args = malloc(sizeof(bound));
         args->start = end;
@@ -170,12 +174,11 @@ int main(int argc, char* argv[]){
     }
 
     // espera por todas threads
-#ifdef DEBUG
-    printf("Join\n");
-#endif
     for (int i = 0; i < nthreads; i++){
         pthread_join(tid[i], NULL);
     }
+    GET_TIME(finish);
+    elapsed = finish - begin;
 	
     #ifdef DEBUG
 	printf("A\n");
@@ -186,6 +189,10 @@ int main(int argc, char* argv[]){
     printMatrix(product);
 	#endif
 	writeMatrix(product, argv[3]);
+
+    // escreva resultados para formato .csv
+    // threads, dimensão, tempo
+    printf("%d, %d, %f\n", nthreads, product->rows, elapsed);
 
 	freeMatrix(matrix1);
 	freeMatrix(matrix2);
