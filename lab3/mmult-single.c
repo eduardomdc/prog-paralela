@@ -64,6 +64,7 @@ int writeMatrix(mat* m, char* filename){
 	}
 	//finaliza o uso das variaveis
 	fclose(fd);
+    return 0;
 }
 
 void printMatrix(mat* matrix){
